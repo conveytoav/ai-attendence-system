@@ -1,0 +1,14 @@
+flask
+opencv-python
+numpy
+pandas
+scikit-learn
+pillow
+tensorflow
+pydrive2
+dlib
+
+Note:
+
+If you have a specific .whl file for dlib (e.g., dlib-19.22.1-cp39-cp39-win_amd64.whl), you may need to install it manually with pip install dlib-19.22.1-cp39-cp39-win_amd64.whl after installing the other requirements.
+For Google Drive integration, make sure you have client_secrets.json in your project root.
