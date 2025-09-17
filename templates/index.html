@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .form-section {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .form-section h2 {
+            color: #1e293b;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 10px 20px rgba(5, 150, 105, 0.3);
+        }
+
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash-message {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .flash-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .flash-error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .attendance-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .table-header h3 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .table-content {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #374151;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-present {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-absent {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .status-late {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .no-data-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 2px solid #e2e8f0;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #4f46e5;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Attendance Manager</h1>
+            <p>Track and manage attendance with ease</p>
+        </div>
+
+        <div class="content">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">
+                                {% if category == 'success' %}
+                                    ✅
+                                {% else %}
+                                    ❌
+                                {% endif %}
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('export_drive') }}" method="get">
+                <button type="submit">📤 Backup DB to Google Drive</button>
+            </form>
+
+            <!-- Add Attendance Form -->
+            <div class="form-section">
+                <h2>➕ Add Attendance</h2>
+                <form method="POST" action="/add_attendance">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Name:</label>
+                            <input type="text" id="name" name="name" required placeholder="Enter full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Date:</label>
+                            <input type="date" id="date" name="date" required value="{{ selected_date }}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="time">Time:</label>
+                            <input type="time" id="time" name="time" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status:</label>
+                            <select id="status" name="status">
+                                <option value="present">Present</option>
+                                <option value="absent">Absent</option>
+                                <option value="late">Late</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">Add Attendance</button>
+                </form>
+            </div>
+
+            <!-- View Attendance Form -->
+            <div class="form-section">
+                <h2>📅 View Attendance</h2>
+                <form method="POST" action="/attendance">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="selected_date">Select Date:</label>
+                            <input type="date" id="selected_date" name="selected_date" value="{{ selected_date }}" required>
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: end; gap: 10px;">
+                            <button type="submit" class="btn btn-secondary">View Attendance</button>
+                            <a href="/export_drive" class="btn" style="background: #f59e0b; text-decoration: none; display: inline-block;">Backup(csv)</a>
+                        </div>
+                    </div>
+                </form>
+                
+                <!-- Database Reset (Use with caution) -->
+                <div style="margin-top: 20px; padding: 15px; background: #fef2f2; border-radius: 10px; border: 1px solid #fecaca;">
+                    <p style="color: #dc2626; font-size: 14px; margin-bottom: 10px;">⚠️ <strong>Danger Zone:</strong> This will delete all attendance data!</p>
+                    <form method="POST" action="/reset_db" onsubmit="return confirm('Are you sure you want to delete ALL attendance data? This cannot be undone!');">
+                        <button type="submit" class="btn" style="background: #dc2626; font-size: 14px; padding: 8px 16px;">Reset Database</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Attendance Data Display -->
+            {% if attendance_data %}
+                <!-- Statistics -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">{{ attendance_data|length }}</div>
+                        <div class="stat-label">Total Records</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">
+                            {% set present_count = namespace(value=0) %}
+                            {% for record in attendance_data %}
+                                {% if record[2] == 'present' %}
+                                    {% set present_count.value = present_count.value + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                            {{ present_count.value }}
+                        </div>
+                        <div class="stat-label">Present</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">
+                            {% set absent_count = namespace(value=0) %}
+                            {% for record in attendance_data %}
+                                {% if record[2] == 'absent' %}
+                                    {% set absent_count.value = absent_count.value + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                            {{ absent_count.value }}
+                        </div>
+                        <div class="stat-label">Absent</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">
+                            {% set late_count = namespace(value=0) %}
+                            {% for record in attendance_data %}
+                                {% if record[2] == 'late' %}
+                                    {% set late_count.value = late_count.value + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                            {{ late_count.value }}
+                        </div>
+                        <div class="stat-label">Late</div>
+                    </div>
+                </div>
+
+                <!-- Attendance Table -->
+                <div class="attendance-table">
+                    <div class="table-header">
+                        <h3>Attendance for {{ selected_date }}</h3>
+                        <p>{{ attendance_data|length }} records found</p>
+                    </div>
+                    <div class="table-content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in attendance_data %}
+                                    <tr>
+                                        <td>{{ record[0] }}</td>
+                                        <td>{{ record[1] }}</td>
+                                        <td>
+                                            <span class="status-badge status-{{ record[2] }}">
+                                                {{ record[2] }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% elif no_data %}
+                <div class="attendance-table">
+                    <div class="table-header">
+                        <h3>Attendance for {{ selected_date }}</h3>
+                        <p>No records found</p>
+                    </div>
+                    <div class="no-data">
+                        <div class="no-data-icon">📋</div>
+                        <h3>No Attendance Records Found</h3>
+                        <p>No attendance records were found for {{ selected_date }}.</p>
+                        <p>Use the form above to add attendance records.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Auto-fill current time when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const timeInput = document.getElementById('time');
+            if (timeInput) {
+                const now = new Date();
+                const currentTime = now.toTimeString().slice(0, 5);
+                timeInput.value = currentTime;
+            }
+        });
+
+        // Auto-submit form when date changes in view attendance
+        const dateSelect = document.getElementById('selected_date');
+        if (dateSelect) {
+            dateSelect.addEventListener('change', function() {
+                console.log('Date changed to:', this.value);
+                this.form.submit();
+            });
+        }
+
+        // Form validation
+        const addAttendanceForm = document.querySelector('form[action="/add_attendance"]');
+        if (addAttendanceForm) {
+            addAttendanceForm.addEventListener('submit', function(e) {
+                const name = document.getElementById('name').value.trim();
+                const date = document.getElementById('date').value;
+                const time = document.getElementById('time').value;
+                
+                if (!name || !date || !time) {
+                    e.preventDefault();
+                    alert('Please fill in all required fields!');
+                    return false;
+                }
+                
+                console.log('Submitting attendance:', { name, date, time });
+            });
+        }
+    </script>
+</body>
+</html>
